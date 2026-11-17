@@ -18,6 +18,7 @@
 
     const CJK_RE = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;   // 한글은 띄어쓰기 단위라 제외
     const FILL_STEPS = 200, LIFT_STEPS = 40, GLOW_STEPS = 20;
+    const LIFT_DELAY = 0.1;                                                   // 하이라이트보다 아주 살짝 뒤에 들어올림 시작(초)
     const GLOW_TAIL = 0.5;                                                    // 단어가 끝난 뒤 글로우가 사라지는 시간(초)
 
     const WS = {
@@ -133,7 +134,7 @@
         const x = p * (n + F);
         // 들어올림은 너무 빠른 단어에서도 부드럽게 보이도록 최소 0.45초에 걸쳐 진행
         const ld = dur < 0.45 ? 0.45 : dur;
-        const xl = _clamp01((t - w.fs) / ld) * (n + F);
+        const xl = _clamp01((t - w.fs - LIFT_DELAY) / ld) * (n + F);
         const tail = w.gl ? GLOW_TAIL : 0;
         const gf = w.gl ? (t <= w.fe ? 1 : 1 - _smooth(_clamp01((t - w.fe) / GLOW_TAIL))) : 0;
 
@@ -153,7 +154,7 @@
                 }
             }
         }
-        return t >= w.fs + Math.max(dur, ld) + tail + 0.02;
+        return t >= w.fs + LIFT_DELAY + Math.max(dur, ld) + tail + 0.02;
     }
 
     function _fullPaint(t) {
